@@ -8,13 +8,17 @@ var cors = require("cors");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/auth.routes");
-var categoriesRouter = require("./routes/categories");
 // Initialize database
 const sequelize = require("./Config/db");
+const { syncDatabase } = require("./Models");
+const PORT = process.env.PORT || 4001;
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => {
     console.log("Database models synchronized");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error("Failed to sync database models", err);
@@ -40,7 +44,11 @@ app.use("/api/auth", usersRouter);
 
 // customr routes
 const customerRoutes = require("./routes/loyalty.routes");
+const staffRoutes = require("./routes/staff.routes");
+const servicesRoutes = require("./routes/services.routes");
 app.use("/api/v1/loyalty", customerRoutes);
+app.use("/api/v1/staff", staffRoutes);
+app.use("/api/v1/services", servicesRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

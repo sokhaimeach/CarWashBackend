@@ -1,65 +1,28 @@
 const jwt = require("jsonwebtoken");
-const User = require("../Models/User");
 
-// Protect routes
-const protect = async (req, res, next) => {
-  let token;
-
-  // Check if token exists in headers (Bearer token)
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      // Get user from token and attach to req.user
-      req.user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ["password"] }
-      });
-
-      if (!req.user) {
-        return res.status(401).json({ message: "Not authorized, user not found" });
-      }
-
-      next();
-    } catch (error) {
-      console.error(error);
-      return res.status(401).json({ message: "Not authorized, token failed" });
-    }
-  } 
-  // Alternatively, check cookies if token is stored there
-  else if (req.cookies && req.cookies.token) {
-    try {
-      token = req.cookies.token;
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      // Get user from token and attach to req.user
-      req.user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ["password"] }
-      });
-
-      if (!req.user) {
-        return res.status(401).json({ message: "Not authorized, user not found" });
-      }
-
-      next();
-    } catch (error) {
-      console.error(error);
-      return res.status(401).json({ message: "Not authorized, token failed" });
-    }
+const auth = (req, res, next) => {
+  const header = req.headers["authorization"];
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
   }
 
-  if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token" });
-  }
-};
-
-// Admin middleware - MUST be placed after `protect` middleware
-const admin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+  const token = header.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.staff = decoded;
     next();
-  } else {
-    return res.status(403).json({ message: "Not authorized as an admin" });
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
-module.exports = { protect, admin };
+const requireRole =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.staff.role)) {
+      return res.status(403).json({ message: "Insufficient permissions" });
+    }
+    next();
+  };
+
+module.exports = { auth, requireRole };

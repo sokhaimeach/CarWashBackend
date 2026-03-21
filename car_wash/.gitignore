@@ -1,9 +1,4 @@
-
-
-
-
 node_modules
-dist
-build
-*.log
-*.env
+.\dist
+.\build
+.env

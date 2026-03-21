@@ -10,21 +10,21 @@ const c = require("../Controller/services.controller");
 
 router.use(auth);
 
-router.get("/", c.getService);
+router.get("/", c.getAll);
 router.post(
   "/",
   createServiceRules,
   validate,
   requireRole("manager"),
-  c.crateService,
+  c.create,
 );
-router.get("/:id", uuidParamRules, validate, c.getOneService);
+router.get("/:id", uuidParamRules, validate, c.getOne);
 router.put(
   "/:id",
   [...uuidParamRules, ...createServiceRules],
   validate,
   requireRole("manager"),
-  c.updateService,
+  c.update,
 );
 router.patch(
   "/:id/toggle",

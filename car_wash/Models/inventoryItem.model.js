@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../Config/db");
-
-const InverntoryItem = sequelize.define(
+const inverntoryItem = sequelize.define(
   "inventory_items",
   {
     id: {
@@ -22,4 +21,4 @@ const InverntoryItem = sequelize.define(
     updatedAt: false,
   },
 );
-module.exports = InverntoryItem;
+module.exports = inverntoryItem;

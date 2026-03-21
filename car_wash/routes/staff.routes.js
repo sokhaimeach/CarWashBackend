@@ -7,26 +7,14 @@ const {
   updatePinRules,
   uuidParamRules,
   dateRangeRules,
-} = require("../middleware/validate");
+} = require("../Middleware/validate");
 const c = require("../Controller/staff.controller");
 
-router.use(auth);
+// router.use(auth);
 
-router.get("/", requireRole("manager"), c.getAllStuff);
-router.post(
-  "/",
-  createStaffRules,
-  validate,
-  requireRole("manager"),
-  c.createStaff,
-);
-router.get(
-  "/:id",
-  uuidParamRules,
-  validate,
-  requireRole("manager"),
-  c.getOneStaff,
-);
+router.get("/", requireRole("manager"), c.getAll);
+router.post("/", c.create);
+router.get("/:id", uuidParamRules, validate, requireRole("manager"), c.getOne);
 router.put(
   "/:id",
   [...uuidParamRules, ...updateStaffRules],
@@ -46,14 +34,14 @@ router.patch(
   uuidParamRules,
   validate,
   requireRole("manager"),
-  c.detactive,
+  c.deactivate,
 );
 router.patch(
   "/:id/activate",
   uuidParamRules,
   validate,
   requireRole("manager"),
-  c.activeStaff,
+  c.activate,
 );
 router.get(
   "/:id/transactions",

@@ -7,7 +7,7 @@ const {
   adjustPointsRules,
   uuidParamRules,
   paginationRules,
-} = require("../middleware/validate");
+} = require("../Middleware/validate");
 const c = require("../Controller/loyalty.controller");
 router.use(auth);
 

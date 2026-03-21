@@ -18,5 +18,4 @@ const serviceConsumption = sequelize.define(
     indexes: [{ unique: true, fields: ["service_id", "item_id"] }],
   },
 );
-
 module.exports = serviceConsumption;

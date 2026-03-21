@@ -1,31 +1,27 @@
-// start Service
-
-const Service = require("../Models/service.model");
 const ServiceConsumption = require("../Models/serviceConsumption.model");
+const Service = require("../Models/service.model");
 const InventoryItem = require("../Models/inventoryItem.model");
-
-// getservice
-const getService = async (req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
-    const where = req.query.active === "true" ? {} : {};
-    const serviceData = await Service.findAll({
+    const where =
+      req.query.active === "true"
+        ? {
+            is_active: true,
+          }
+        : {};
+    const rows = await Service.findAll({
       where,
       order: [["name", "ASC"]],
     });
-    if (serviceData <= 0) {
-      return res
-        .status(202)
-        .json({ success: true, message: "service Not Have!!!" });
-    }
-    res.status(200).json({ success: true, data: serviceData });
-  } catch (error) {
-    next(error);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    next(err);
   }
 };
-// get one Service
-const getOneService = async (req, res, next) => {
+
+const getOne = async (req, res, next) => {
   try {
-    const getOnedata = await Service.findByPk(req.params.id, {
+    const service = await Service.findByPk(req.params.id, {
       include: [
         {
           model: ServiceConsumption,
@@ -33,49 +29,49 @@ const getOneService = async (req, res, next) => {
           include: [
             {
               model: InventoryItem,
-              as: "items",
+              as: "item",
               attributes: ["id", "name", "unit"],
             },
           ],
         },
       ],
     });
-    if (!getOnedata) {
-      return res.status(404).json({
-        success: false,
-        message: "service Not Founded!",
-      });
-    }
-  } catch (error) {
-    next(error);
+    if (!service)
+      return res
+        .status(404)
+        .json({ success: false, message: "Service not found" });
+
+    res.json({ success: true, data: service });
+  } catch (err) {
+    next(err);
   }
 };
-// create service
-const crateService = async (req, res, next) => {
+
+const create = async (req, res, next) => {
   try {
     const { name, vehicle_type, price, duration_mins } = req.body;
-    const sCreate = await Service.create({
+    const s = await Service.create({
       name,
       vehicle_type: vehicle_type || "all",
       price,
       duration_mins: duration_mins || 30,
     });
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       data: {
-        message: "Create Service Successfullt",
-        id: sCreate.id,
+        message: "Service created",
+        id: s.id,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-// update Service
-const updateService = async (req, res, next) => {
+
+const update = async (req, res, next) => {
   try {
     const { name, vehicle_type, price, duration_mins } = req.body;
-    const [u] = await Service.update(
+    const [n] = await Service.update(
       {
         name,
         vehicle_type,
@@ -88,44 +84,43 @@ const updateService = async (req, res, next) => {
         },
       },
     );
-    if (!u) {
-      return res.status(404).json({
-        success: false,
-        message: "service Not Founded!!",
-      });
-    }
-    res.status(200).json({
+    if (!n)
+      return res
+        .status(404)
+        .json({ success: false, message: "Service not found" });
+
+    res.json({
       success: true,
-      data: { messgae: "Service Update Successful" },
+      data: {
+        message: "Service updated",
+      },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-// toggle
+
 const toggle = async (req, res, next) => {
   try {
     const s = await Service.findByPk(req.params.id);
-    if (!s) {
-      return res.status(404).json({
-        success: false,
-        messgae: "Service Not Found",
-      });
-    }
+    if (!s)
+      return res
+        .status(404)
+        .json({ success: false, message: "Service not found" });
+
     await s.update({
       is_active: !s.is_active,
     });
-    res.status(200).json({
+    res.json({
       success: true,
       data: {
         message: `Service ${s.is_active ? "activated" : "deactivated"}`,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-// get Consumption
 const getConsumption = async (req, res, next) => {
   try {
     const rows = await ServiceConsumption.findAll({
@@ -135,31 +130,27 @@ const getConsumption = async (req, res, next) => {
       include: [
         {
           model: InventoryItem,
-          as: "Items",
+          as: "item",
           attributes: ["id", "name", "unit", "cost_per_unit"],
         },
       ],
     });
-    res.status(200).json({
-      success: true,
-      data: rows,
-    });
-  } catch (error) {
-    next(error);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    next(err);
   }
 };
-// addConsumption
+
 const addConsumption = async (req, res, next) => {
   try {
     const { item_id, qty_per_service } = req.body;
-    const itmes = await InventoryItem.findByPk(req.params.id);
-    if (!itmes) {
-      return res.status(404).json({
-        success: false,
-        message: "Inventory Not Founded!",
-      });
-    }
-    const [row, createCon] = await ServiceConsumption.findOrCreate({
+    const item = await InventoryItem.findByPk(item_id);
+    if (!item)
+      return res
+        .status(404)
+        .json({ success: false, message: "Inventory item not found" });
+
+    const [row, created] = await ServiceConsumption.findOrCreate({
       where: {
         service_id: req.params.id,
         item_id,
@@ -168,21 +159,19 @@ const addConsumption = async (req, res, next) => {
         qty_per_service,
       },
     });
-    if (!createCon) {
-      await row.update({ qty_per_service });
-    }
-    res.status(200).json({
+    if (!created) await row.update({ qty_per_service });
+
+    res.status(201).json({
       success: true,
       data: {
-        message: "Concumption Rule Created",
+        message: "Consumption rule saved",
         id: row.id,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-// Update Comsumption
 const updateConsumption = async (req, res, next) => {
   try {
     const [n] = await ServiceConsumption.update(
@@ -191,57 +180,56 @@ const updateConsumption = async (req, res, next) => {
       },
       {
         where: {
-          id: params.consumptionId,
+          id: req.params.consumptionId,
           service_id: req.params.id,
         },
       },
     );
-    if (!n) {
-      return res.status(404).json({
-        success: false,
-        message: "consumption rule not found",
-      });
-    }
-    res.status(200).json({
+    if (!n)
+      return res
+        .status(404)
+        .json({ success: false, message: "Consumption rule not found" });
+
+    res.json({
       success: true,
       data: {
-        messgae: "Consumption Updated!",
+        message: "Consumption rule updated",
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-// deleted consumption
+
 const deleteConsumption = async (req, res, next) => {
   try {
-    const [d] = await ServiceConsumption.destroy({
+    const n = await ServiceConsumption.destroy({
       where: {
         id: req.params.consumptionId,
         service_id: req.params.id,
       },
     });
-    if (!d) {
-      return res.status(404).json({
-        success: false,
-        message: "Consumption Not found",
-      });
-    }
-    res.status(200).json({
+    if (!n)
+      return res
+        .status(404)
+        .json({ success: false, message: "Consumption rule not found" });
+
+    res.json({
       success: true,
       data: {
-        messgae: "Consumption Updated Successful",
+        message: "Consumption rule deleted",
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
+
 module.exports = {
-  getService,
-  getOneService,
-  crateService,
-  updateService,
+  getAll,
+  getOne,
+  create,
+  update,
   toggle,
   getConsumption,
   addConsumption,

@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../Config/db");
-const Studff = sequelize.define(
+const staff = sequelize.define(
   "staff",
   {
     id: {
@@ -24,4 +24,4 @@ const Studff = sequelize.define(
   },
 );
 
-module.exports = Studff;
+module.exports = staff;

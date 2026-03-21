@@ -47,10 +47,12 @@ const customerRoutes = require("./routes/loyalty.routes");
 const staffRoutes = require("./routes/staff.routes");
 const serviceRoutes = require("./routes/services.routes");
 const authRoutes = require("./routes/auth.routes");
+const inventoryRoutes = require("./routes/inventory.routes");
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/loyalty", customerRoutes);
 app.use("/api/v1/staff", staffRoutes);
 app.use("/api/v1/service", serviceRoutes);
+app.use("/api/v1/inventory", inventoryRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { auth, requireRole } = require("../middleware/auth");
+const { auth, requireRole } = require("../Middleware/authMiddleware");
 const {
   validate,
   createItemRules,
@@ -8,56 +8,86 @@ const {
   uuidParamRules,
   paginationRules,
 } = require("../Middleware/validate");
-const c = require("../controllers/inventory.controller");
+const {
+  getItems,
+  getLowStock,
+  createItem,
+  updateItem,
+  getStockHistory,
+  getSuppliers,
+  createSupplier,
+  updateSupplier,
+  getPurchaseOrders,
+  createPurchaseOrder,
+  receivePurchaseOrder,
+  cancelPurchaseOrder,
+} = require("../Controller/inventory.controller");
 
 router.use(auth);
 
-router.get("/items", c.getItems);
-router.get("/items/alerts", c.getLowStock);
+// items and stock transctions routes
+router.get("/items", paginationRules, validate, getItems);
+router.get("/items/alerts", getLowStock);
 router.post(
   "/items",
   createItemRules,
   validate,
   requireRole("manager"),
-  c.createItem,
+  createItem,
 );
 router.put(
   "/items/:id",
   [...uuidParamRules, ...createItemRules],
   validate,
   requireRole("manager"),
-  c.updateItem,
+  updateItem,
 );
 router.get(
   "/items/:id/transactions",
   [...uuidParamRules, ...paginationRules],
   validate,
-  c.getStockHistory,
+  getStockHistory,
 );
 
-router.get("/suppliers", c.getSuppliers);
+// suppliers routes
+router.get("/suppliers", paginationRules, validate, getSuppliers);
 router.post(
   "/suppliers",
   createSupplierRules,
   validate,
   requireRole("manager"),
-  c.createSupplier,
+  createSupplier,
+);
+router.put(
+  "/suppliers/:id",
+  [...uuidParamRules, ...createSupplierRules],
+  validate,
+  requireRole("manager"),
+  updateSupplier,
 );
 
-router.get("/purchase-orders", c.getPurchaseOrders);
+// purchase order and purchase order items routes
+router.get("/purchase-orders", getPurchaseOrders);
 router.post(
   "/purchase-orders",
   createPurchaseOrderRules,
   validate,
   requireRole("manager"),
-  c.createPurchaseOrder,
+  createPurchaseOrder,
 );
 router.patch(
   "/purchase-orders/:id/receive",
   uuidParamRules,
   validate,
   requireRole("manager"),
-  c.receivePurchaseOrder,
+  receivePurchaseOrder,
+);
+router.patch(
+  "/purchase-orders/:id/cancel",
+  uuidParamRules,
+  validate,
+  requireRole("manager"),
+  cancelPurchaseOrder,
 );
 
 module.exports = router;

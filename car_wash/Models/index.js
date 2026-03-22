@@ -15,6 +15,7 @@ const Supplier = require('./supplier.model');
 const StockTransaction = require('./stockTransaction.model');
 const PurchaseOrder = require('./purchaseOrder.model');
 const PurchaseOrderItem = require('./purchaseOrderItem.model');
+const Payment = require("./payment.model");
 
 Customer.hasMany(CustomerMembership, {
   foreignKey: "customer_id",
@@ -70,6 +71,12 @@ PurchaseOrder.hasMany(PurchaseOrderItem, { foreignKey: 'po_id', as: 'items' })
 PurchaseOrderItem.belongsTo(PurchaseOrder,  { foreignKey: 'po_id' })
 PurchaseOrderItem.belongsTo(InventoryItem,  { foreignKey: 'item_id', as: 'inventoryItem' })
 
+// // Transaction → Items + Payments
+Transaction.hasMany(TransactionItem, { foreignKey: 'transaction_id', as: 'items' })
+TransactionItem.belongsTo(Transaction, { foreignKey: 'transaction_id' })
+Transaction.hasMany(Payment,         { foreignKey: 'transaction_id', as: 'payments' })
+Payment.belongsTo(Transaction,       { foreignKey: 'transaction_id' })
+
 const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: true });
@@ -95,5 +102,9 @@ module.exports = {
   Supplier,
   StockTransaction,
   PurchaseOrder,
-  PurchaseOrderItem
+  PurchaseOrderItem,
+  Payment,
+  Transaction,
+  Service,
+  Staff
 };

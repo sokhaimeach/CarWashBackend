@@ -48,3 +48,63 @@ This `README` focuses on inventory-related features and recent updates made in `
 
 - Keep `createSupplierRules`/`createItemRules` in sync with controller field requirements.
 - For production, consider moving more business validations to the model layer (e.g. Sequelize validators) and using consistent success response format.
+
+## 📊 Reporting Module
+
+The reporting system provides comprehensive business intelligence and analytics capabilities for the car wash management system. All reports are protected with manager-level authentication and provide real-time insights into business performance.
+
+### Report Features Implemented
+
+#### 📈 Daily Summary Report
+- **Endpoint**: `GET /api/v1/reports/daily?date=YYYY-MM-DD`
+- **Features**:
+  - Transaction count and total revenue for the day
+  - Average ticket value calculation
+  - Top 5 services by revenue
+  - Low stock alerts for inventory items
+- **Use Case**: Daily business performance overview
+
+#### 💰 Revenue Summary Report
+- **Endpoint**: `GET /api/v1/reports/summary?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- **Features**:
+  - Total transactions and revenue for date range
+  - Average ticket calculation
+  - Total discounts and points redeemed
+  - Revenue breakdown by payment method
+- **Use Case**: Period-based financial analysis
+
+#### 🏆 Top Services Report
+- **Endpoint**: `GET /api/v1/reports/top-services?from=YYYY-MM-DD&to=YYYY-MM-DD&limit=5`
+- **Features**:
+  - Services ranked by total revenue
+  - Times sold and total quantity metrics
+  - Vehicle type categorization
+  - Configurable result limits
+- **Use Case**: Service popularity and profitability analysis
+
+#### 📦 Inventory Cost of Goods Sold (COGS)
+- **Endpoint**: `GET /api/v1/reports/inventory-cogs?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- **Features**:
+  - Total cost of inventory used in services
+  - Item-wise cost breakdown
+  - Cost per unit tracking
+  - Period-based filtering
+- **Use Case**: Inventory cost analysis and profitability tracking
+
+#### 👑 Membership Statistics
+- **Endpoint**: `GET /api/v1/reports/membership-stats`
+- **Features**:
+  - Active membership count
+  - Monthly membership changes (new, expired)
+  - Membership distribution by tier
+  - Points liability calculation (converted to dollars)
+- **Use Case**: Loyalty program performance and financial impact
+
+#### 👷 Staff Performance Report
+- **Endpoint**: `GET /api/v1/reports/staff-performance?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- **Features**:
+  - Transaction count per staff member
+  - Total sales and average ticket value
+  - Performance ranking by revenue
+  - Role-based filtering
+- **Use Case**: Staff productivity and performance evaluation

@@ -16,6 +16,7 @@ const StockTransaction = require("./stockTransaction.model");
 const PurchaseOrder = require("./purchaseOrder.model");
 const PurchaseOrderItem = require("./purchaseOrderItem.model");
 const Payment = require("../Models/payment.model");
+
 Customer.hasMany(CustomerMembership, {
   foreignKey: "customer_id",
   as: "memberships",

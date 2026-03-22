@@ -1,14 +1,21 @@
-// const router = require('express').Router()
-// const { auth, requireRole } = require('../middleware/auth')
-// const c = require('../controllers/reports.controller')
+const router = require("express").Router();
+const { auth, requireRole } = require("../Middleware/authMiddleware");
+const {
+  getDailySummary,
+  getSummary,
+  getTopServices,
+  getInventoryCOGS,
+  getMembershipStats,
+  getStaffPerformance,
+} = require("../Controller/reports.controller");
 
-// router.use(auth, requireRole('manager'))
+router.use(auth, requireRole("manager"));
 
-// router.get('/summary',            c.getSummary)
-// router.get('/top-services',       c.getTopServices)
-// router.get('/inventory-cogs',     c.getInventoryCOGS)
-// router.get('/membership-stats',   c.getMembershipStats)
-// router.get('/staff-performance',  c.getStaffPerformance)
-// router.get('/daily',              c.getDailySummary)
+router.get("/summary", getSummary);
+router.get("/top-services", getTopServices);
+router.get("/inventory-cogs", getInventoryCOGS);
+router.get("/membership-stats", getMembershipStats);
+router.get("/staff-performance", getStaffPerformance);
+router.get("/daily", getDailySummary);
 
-// module.exports = router
+module.exports = router;

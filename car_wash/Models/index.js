@@ -11,6 +11,11 @@ const TransactionItem = require("./transactionItem.model");
 const Staff = require("./staff.model");
 const transaction = require("./transaction.model");
 const service = require("./service.model");
+const Supplier = require('./supplier.model');
+const StockTransaction = require('./stockTransaction.model');
+const PurchaseOrder = require('./purchaseOrder.model');
+const PurchaseOrderItem = require('./purchaseOrderItem.model');
+
 Customer.hasMany(CustomerMembership, {
   foreignKey: "customer_id",
   as: "memberships",
@@ -51,6 +56,20 @@ ServiceConsumption.belongsTo(InventoryItem, {
   as: "item",
 });
 InventoryItem.hasMany(ServiceConsumption, { foreignKey: "item_id" });
+
+// InventoryItem → StockTransactions
+InventoryItem.hasMany(StockTransaction, { foreignKey: 'item_id', as: 'movements' })
+StockTransaction.belongsTo(InventoryItem, { foreignKey: 'item_id', as: 'item' })
+
+// Supplier → PurchaseOrders
+Supplier.hasMany(PurchaseOrder,  { foreignKey: 'supplier_id', as: 'orders' })
+PurchaseOrder.belongsTo(Supplier,{ foreignKey: 'supplier_id', as: 'supplier' })
+
+// PurchaseOrder → Items
+PurchaseOrder.hasMany(PurchaseOrderItem, { foreignKey: 'po_id', as: 'items' })
+PurchaseOrderItem.belongsTo(PurchaseOrder,  { foreignKey: 'po_id' })
+PurchaseOrderItem.belongsTo(InventoryItem,  { foreignKey: 'item_id', as: 'inventoryItem' })
+
 const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: true });
@@ -73,4 +92,8 @@ module.exports = {
   service,
   ServiceConsumption,
   InventoryItem,
+  Supplier,
+  StockTransaction,
+  PurchaseOrder,
+  PurchaseOrderItem
 };

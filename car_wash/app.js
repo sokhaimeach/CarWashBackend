@@ -50,6 +50,7 @@ const authRoutes = require("./routes/auth.routes");
 const inventoryRoutes = require("./routes/inventory.routes");
 const posRoutes = require("./routes/pos.routes");
 const reportRoutes = require("./routes/reports.routes");
+const categoriesRouter = require("./routes/categories");
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/loyalty", customerRoutes);
 app.use("/api/v1/staff", staffRoutes);
@@ -57,6 +58,7 @@ app.use("/api/v1/service", serviceRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
 app.use("/api/v1/pos", posRoutes);
 app.use("/api/v1/reports", reportRoutes);
+app.use("/api/v1/categories", categoriesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
